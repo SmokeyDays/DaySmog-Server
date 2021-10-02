@@ -1,36 +1,24 @@
 package top.smokeydays.web.daysmogserver.datatype;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
+import lombok.Data;
 
-@Entity
+@Data
+@Builder
+@TableName("DSUser")
 public class DSUser {
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    @TableField(value = "name")
     private String name;
-    private String password;
-    private String id;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    @TableField(value = "addr")
+    private String addr;
 
 }

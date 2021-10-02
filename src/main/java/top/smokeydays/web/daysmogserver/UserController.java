@@ -22,11 +22,9 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping(path = "/add",consumes = "application/json")
+    @PostMapping(path = "/add",consumes = "application/json")
     public @ResponseBody String addNewUser (@RequestBody DSUser nowUser){
-        Instant instant = Instant.now();
-        nowUser.setId(""+instant.toString()+nowUser.getName());
-        userRepository.save(nowUser);
+        userRepository.insert(nowUser);
         return "Registered Successfully";
     }
 

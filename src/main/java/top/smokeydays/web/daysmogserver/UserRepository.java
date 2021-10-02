@@ -1,8 +1,10 @@
 package top.smokeydays.web.daysmogserver;
 
-import org.springframework.data.repository.CrudRepository;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 import top.smokeydays.web.daysmogserver.datatype.DSUser;
 
-public interface UserRepository extends CrudRepository<DSUser, Long> {
+@Mapper
+public interface UserRepository extends BaseMapper<DSUser> {
 
 }
