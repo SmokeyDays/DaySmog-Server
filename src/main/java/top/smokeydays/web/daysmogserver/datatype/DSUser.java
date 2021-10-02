@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @TableName("DSUser")
 public class DSUser {
@@ -18,7 +19,7 @@ public class DSUser {
     @TableField(value = "name")
     private String name;
 
-    @TableField(value = "addr")
-    private String addr;
+    @TableField(value = "password")
+    private String password;
 
 }

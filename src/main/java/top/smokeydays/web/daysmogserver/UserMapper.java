@@ -5,6 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import top.smokeydays.web.daysmogserver.datatype.DSUser;
 
 @Mapper
-public interface UserRepository extends BaseMapper<DSUser> {
+public interface UserMapper extends BaseMapper<DSUser> {
 
 }

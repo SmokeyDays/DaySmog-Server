@@ -1,32 +1,40 @@
 package top.smokeydays.web.daysmogserver;
 
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import top.smokeydays.web.daysmogserver.datatype.DSUser;
 
-import java.time.Instant;
-import java.util.Date;
-
 
 @Controller
-@RequestMapping(path = "/demo")
+@RequestMapping(path = "/user")
 public class UserController {
 
-    private UserRepository userRepository;
+    private UserMapper userMapper;
 
     @Autowired
-    public void setUserController(UserRepository userRepository){
-        this.userRepository = userRepository;
+    public void setUserController(UserMapper userMapper){
+        this.userMapper = userMapper;
     }
 
-    @PostMapping(path = "/add",consumes = "application/json")
-    public @ResponseBody String addNewUser (@RequestBody DSUser nowUser){
-        userRepository.insert(nowUser);
+    @PostMapping(path = "/register",consumes = "application/json")
+    public @ResponseBody String userRegister (@RequestBody DSUser nowUser){
+        System.out.println(nowUser.toString());
+        userMapper.insert(nowUser);
         return "Registered Successfully";
     }
 
+    @PostMapping(path = "/login",consumes = "application/json")
+    public @ResponseBody String userLogin (@RequestBody DSUser nowUser){
+        System.out.println(nowUser.toString());
+
+        if(true){
+            return "Login Successfully";
+        }else{
+            return "Login Failed";
+        }
+
+    }
 
 }
