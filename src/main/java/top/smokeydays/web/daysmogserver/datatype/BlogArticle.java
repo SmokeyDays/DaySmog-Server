@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName("BlogArticle")
+@TableName("blog_article")
 public class BlogArticle {
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -19,8 +19,8 @@ public class BlogArticle {
     @TableField(value = "title")
     private String title;
 
-    @TableField(value = "desc")
-    private String desc;
+    @TableField(value = "description")
+    private String description;
 
     @TableField(value = "text")
     private String text;
@@ -30,4 +30,7 @@ public class BlogArticle {
 
     @TableField(value = "tags")
     private String tags;
+
+    @TableField(value = "popularity")
+    private int popularity;
 }

@@ -15,7 +15,7 @@ public class BlogArticleController {
     private BlogArticleMapper blogArticleMapper;
 
     @Autowired
-    public void setUserController(BlogArticleMapper blogArticleMapper){
+    public void setBlogArticleController(BlogArticleMapper blogArticleMapper){
         this.blogArticleMapper = blogArticleMapper;
     }
 
@@ -28,11 +28,13 @@ public class BlogArticleController {
     @PostMapping(path = "/post-article",consumes = "application/json")
     public @ResponseBody String postArticle (@RequestBody BlogArticle nowArticle){
         System.out.println(nowArticle.toString());
-        if(nowArticle.getDesc() == ""){
-            nowArticle.setDesc(nowArticle.getText().substring(0,100));
-        }
+//        if(nowArticle.getDesc() == null && nowArticle.getText().length() > 0){
+//            nowArticle.setDesc(nowArticle.getText().substring(0,Math.min(10,nowArticle.getText().length())));
+//            System.out.println("Over");
+//        }
+        System.out.println(nowArticle.toString());
         blogArticleMapper.insert(nowArticle);
-        return "Registered Successfully";
+        return "Posted Successfully";
     }
 
 }
