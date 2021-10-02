@@ -28,10 +28,10 @@ public class BlogArticleController {
     @PostMapping(path = "/post-article",consumes = "application/json")
     public @ResponseBody String postArticle (@RequestBody BlogArticle nowArticle){
         System.out.println(nowArticle.toString());
-//        if(nowArticle.getDesc() == null && nowArticle.getText().length() > 0){
-//            nowArticle.setDesc(nowArticle.getText().substring(0,Math.min(10,nowArticle.getText().length())));
-//            System.out.println("Over");
-//        }
+        if(nowArticle.getDescription() == null && nowArticle.getText().length() > 0){
+            nowArticle.setDescription(nowArticle.getText().substring(0,Math.min(10,nowArticle.getText().length())));
+            System.out.println("Over");
+        }
         System.out.println(nowArticle.toString());
         blogArticleMapper.insert(nowArticle);
         return "Posted Successfully";
