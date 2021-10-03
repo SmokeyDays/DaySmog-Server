@@ -52,20 +52,21 @@ public class BlogArticleController {
             }
         }
         /* 自动填充摘要和作者 */
-        if(permissionChecker.getBlogArticle().getDescription() == null && permissionChecker.getBlogArticle().getText().length() > 0){
-            permissionChecker.getBlogArticle().setDescription(permissionChecker.getBlogArticle().getText().substring(0,Math.min(10,permissionChecker.getBlogArticle().getText().length())));
+        BlogArticle blogArticle = permissionChecker.getBlogArticle();
+        if(blogArticle.getDescription() == null && blogArticle.getText().length() > 0){
+            blogArticle.setDescription(blogArticle.getText().substring(0,Math.min(10,blogArticle.getText().length())));
             System.out.println("Over");
         }
-        if(permissionChecker.getBlogArticle().getAuthor() == null){
-            permissionChecker.getBlogArticle().setAuthor(permissionChecker.getUserToken().getUserName());
+        if(blogArticle.getAuthor() == null){
+            blogArticle.setAuthor(permissionChecker.getUserToken().getUserName());
         }
         /* 如果未传入 id 则新建，否则修改 */
-        if(permissionChecker.getBlogArticle().getId() == null){
-            System.out.println(permissionChecker.getBlogArticle().toString());
-            blogArticleMapper.insert(permissionChecker.getBlogArticle());
+        if(blogArticle.getId() == null){
+            System.out.println(blogArticle.toString());
+            blogArticleMapper.insert(blogArticle);
             return "Posted Successfully";
         }else{
-            blogArticleMapper.updateById(permissionChecker.getBlogArticle());
+            blogArticleMapper.updateById(blogArticle);
             return "Updated Successfully";
         }
     }
