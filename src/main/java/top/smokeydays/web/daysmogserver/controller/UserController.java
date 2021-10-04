@@ -1,30 +1,16 @@
-package top.smokeydays.web.daysmogserver;
+package top.smokeydays.web.daysmogserver.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import top.smokeydays.web.daysmogserver.datatype.DSUser;
+import top.smokeydays.web.daysmogserver.dto.LoginRespond;
+import top.smokeydays.web.daysmogserver.tools.SessionManager;
+import top.smokeydays.web.daysmogserver.mapper.UserMapper;
+import top.smokeydays.web.daysmogserver.dao.DSUser;
 
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class LoginRespond {
-    /*
-    typeCode: 状态码
-        0: 登录成功
-        1: 密码错误
-        2: 用户不存在
-     */
-    private Integer typeCode;
-    private String respondSession;
-}
 
 @Controller
 @RequestMapping(path = "/user")
@@ -54,7 +40,8 @@ public class UserController {
     }
 
     @PostMapping(path = "/login",consumes = "application/json")
-    public @ResponseBody LoginRespond userLogin (@RequestBody DSUser nowUser){
+    public @ResponseBody
+    LoginRespond userLogin (@RequestBody DSUser nowUser){
         System.out.println(nowUser.toString());
         /* 搜索用户 */
         QueryWrapper<DSUser> wrapper = Wrappers.query();

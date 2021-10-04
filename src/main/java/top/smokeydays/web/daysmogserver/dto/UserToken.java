@@ -1,8 +1,6 @@
-package top.smokeydays.web.daysmogserver.datatype;
+package top.smokeydays.web.daysmogserver.dto;
 
 import lombok.Data;
-
-import java.time.Instant;
 
 @Data
 public class UserToken {

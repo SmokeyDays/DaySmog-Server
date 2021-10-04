@@ -1,29 +1,27 @@
-package top.smokeydays.web.daysmogserver;
+package top.smokeydays.web.daysmogserver.controller;
 
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import lombok.Data;
-import org.apache.catalina.User;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import top.smokeydays.web.daysmogserver.*;
-import top.smokeydays.web.daysmogserver.datatype.BlogArticle;
-import top.smokeydays.web.daysmogserver.datatype.UserSession;
-import top.smokeydays.web.daysmogserver.datatype.UserToken;
+import top.smokeydays.web.daysmogserver.dao.BlogArticle;
+import top.smokeydays.web.daysmogserver.dao.DSUser;
+import top.smokeydays.web.daysmogserver.dto.PermissionChecker;
+import top.smokeydays.web.daysmogserver.dto.UserToken;
+import top.smokeydays.web.daysmogserver.mapper.BlogArticleMapper;
+import top.smokeydays.web.daysmogserver.tools.SessionManager;
 
-@Data
-class PermissionChecker {
-    private BlogArticle blogArticle;
-    private UserToken userToken;
-}
+import java.util.List;
 
 @Controller
 @RequestMapping(path = "/blog")
 public class BlogArticleController {
 
     private BlogArticleMapper blogArticleMapper;
-
     @Autowired
     public void setBlogArticleController(BlogArticleMapper blogArticleMapper){
         this.blogArticleMapper = blogArticleMapper;
@@ -34,6 +32,22 @@ public class BlogArticleController {
         BlogArticle ret = new BlogArticle();
         ret = blogArticleMapper.selectById(articleId);
         return ret;
+    }
+
+    @GetMapping(path = "/get-article-by-page")
+    public @ResponseBody List<BlogArticle> getArticleByPage (@RequestParam int current,@RequestParam int size,@RequestParam String keyword){
+        /* 生成页面对象 */
+        IPage<BlogArticle> page = new Page<>(current,size);
+        /* 根据条件筛选 */
+        QueryWrapper<BlogArticle> wrapper = Wrappers.query();
+        wrapper.orderByAsc("id").eq("invalid",0);
+        if(keyword != null && (!keyword.equals(""))) {
+            wrapper.and(i -> i.like("title", keyword).or().like("text", keyword).or().like("description", keyword));
+        }
+
+        page = blogArticleMapper.selectPage(page,wrapper);
+        System.out.println(page.getTotal());
+        return page.getRecords();
     }
 
     @PostMapping(path = "/post-article",consumes = "application/json")
@@ -51,7 +65,7 @@ public class BlogArticleController {
                     return "Error: Session Expired";
             }
         }
-        /* 自动填充摘要和作者 */
+        /* 自动填充摘要、作者、人气和可用性 */
         BlogArticle blogArticle = permissionChecker.getBlogArticle();
         if(blogArticle.getDescription() == null && blogArticle.getText().length() > 0){
             blogArticle.setDescription(blogArticle.getText().substring(0,Math.min(10,blogArticle.getText().length())));
@@ -60,6 +74,7 @@ public class BlogArticleController {
         if(blogArticle.getAuthor() == null){
             blogArticle.setAuthor(permissionChecker.getUserToken().getUserName());
         }
+        blogArticle.setInvalid(0);
         /* 如果未传入 id 则新建，否则修改 */
         if(blogArticle.getId() == null){
             System.out.println(blogArticle.toString());
@@ -71,6 +86,7 @@ public class BlogArticleController {
         }
     }
 
+    /* 逻辑删除 */
     @DeleteMapping(path = "/delete-article")
     public @ResponseBody int deleteArticle (@RequestParam Integer articleId,@RequestParam String encryption,@RequestParam String userName){
         UserToken userToken = new UserToken(encryption,userName);
@@ -79,7 +95,10 @@ public class BlogArticleController {
         if(checkerCode != 0){
             return checkerCode;
         }
-        blogArticleMapper.deleteById(articleId);
+        /* 逻辑删除 */
+        BlogArticle blogArticle = blogArticleMapper.selectById(articleId);
+        blogArticle.setInvalid(1);
+        blogArticleMapper.updateById(blogArticle);
         return 0;
     }
 

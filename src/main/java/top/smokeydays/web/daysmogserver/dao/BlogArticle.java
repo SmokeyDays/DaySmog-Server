@@ -1,4 +1,4 @@
-package top.smokeydays.web.daysmogserver.datatype;
+package top.smokeydays.web.daysmogserver.dao;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -33,4 +33,7 @@ public class BlogArticle {
 
     @TableField(value = "popularity")
     private int popularity;
+
+    @TableField(value = "invalid")
+    private int invalid;
 }

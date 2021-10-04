@@ -1,7 +1,7 @@
-package top.smokeydays.web.daysmogserver;
+package top.smokeydays.web.daysmogserver.tools;
 
-import top.smokeydays.web.daysmogserver.datatype.UserSession;
-import top.smokeydays.web.daysmogserver.datatype.UserToken;
+import top.smokeydays.web.daysmogserver.dto.UserSession;
+import top.smokeydays.web.daysmogserver.dto.UserToken;
 
 import java.time.Duration;
 import java.time.Instant;
