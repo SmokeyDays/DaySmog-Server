@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import top.smokeydays.web.daysmogserver.dao.BlogArticle;
 import top.smokeydays.web.daysmogserver.dao.DSUser;
+import top.smokeydays.web.daysmogserver.dto.ArticleResponse;
 import top.smokeydays.web.daysmogserver.dto.PermissionChecker;
 import top.smokeydays.web.daysmogserver.dto.UserToken;
 import top.smokeydays.web.daysmogserver.mapper.BlogArticleMapper;
+import top.smokeydays.web.daysmogserver.service.BlogArticleService;
+import top.smokeydays.web.daysmogserver.service.BlogArticleServiceImpl;
 import top.smokeydays.web.daysmogserver.tools.SessionManager;
 
 import java.util.List;
@@ -27,15 +30,20 @@ public class BlogArticleController {
         this.blogArticleMapper = blogArticleMapper;
     }
 
+    private BlogArticleServiceImpl blogArticleServiceImpl;
+    @Autowired
+    public void setBlogArticleService(BlogArticleServiceImpl blogArticleServiceImpl){
+        this.blogArticleServiceImpl=blogArticleServiceImpl;
+    }
+
     @GetMapping(path = "/get-article")
-    public @ResponseBody BlogArticle getArticle (@RequestParam int articleId){
-        BlogArticle ret = new BlogArticle();
-        ret = blogArticleMapper.selectById(articleId);
-        return ret;
+    public @ResponseBody ArticleResponse<BlogArticle> getArticle (@RequestParam int articleId){
+        ArticleResponse<BlogArticle> articleResponse = new ArticleResponse(blogArticleMapper.selectById(articleId), blogArticleServiceImpl.count());
+        return articleResponse;
     }
 
     @GetMapping(path = "/get-article-by-page")
-    public @ResponseBody List<BlogArticle> getArticleByPage (@RequestParam int current,@RequestParam int size,@RequestParam String keyword){
+    public @ResponseBody ArticleResponse<List<BlogArticle>> getArticleByPage (@RequestParam int current,@RequestParam int size,@RequestParam String keyword){
         /* 生成页面对象 */
         IPage<BlogArticle> page = new Page<>(current,size);
         /* 根据条件筛选 */
@@ -46,8 +54,8 @@ public class BlogArticleController {
         }
 
         page = blogArticleMapper.selectPage(page,wrapper);
-        System.out.println(page.getTotal());
-        return page.getRecords();
+        ArticleResponse<List<BlogArticle>> articleResponse = new ArticleResponse(page.getRecords(), blogArticleServiceImpl.count(wrapper));
+        return articleResponse;
     }
 
     @PostMapping(path = "/post-article",consumes = "application/json")
