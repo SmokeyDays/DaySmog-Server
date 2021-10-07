@@ -14,6 +14,7 @@ import top.smokeydays.web.daysmogserver.dto.ArticleResponse;
 import top.smokeydays.web.daysmogserver.dto.PermissionChecker;
 import top.smokeydays.web.daysmogserver.dto.UserToken;
 import top.smokeydays.web.daysmogserver.mapper.BlogArticleMapper;
+import top.smokeydays.web.daysmogserver.mapper.UserMapper;
 import top.smokeydays.web.daysmogserver.service.BlogArticleService;
 import top.smokeydays.web.daysmogserver.service.BlogArticleServiceImpl;
 import top.smokeydays.web.daysmogserver.tools.SessionManager;
@@ -36,9 +37,21 @@ public class BlogArticleController {
         this.blogArticleServiceImpl=blogArticleServiceImpl;
     }
 
+    private UserMapper userMapper;
+    @Autowired
+    public void setUserController(UserMapper userMapper){
+        this.userMapper = userMapper;
+    }
+
     @GetMapping(path = "/get-article")
     public @ResponseBody ArticleResponse<BlogArticle> getArticle (@RequestParam int articleId){
         ArticleResponse<BlogArticle> articleResponse = new ArticleResponse(blogArticleMapper.selectById(articleId), blogArticleServiceImpl.count());
+        return articleResponse;
+    }
+
+    @GetMapping(path = "/get-all-article")
+    public @ResponseBody List<BlogArticle> getArticle (){
+        List<BlogArticle> articleResponse = blogArticleServiceImpl.list();
         return articleResponse;
     }
 
@@ -50,7 +63,7 @@ public class BlogArticleController {
         QueryWrapper<BlogArticle> wrapper = Wrappers.query();
         wrapper.orderByAsc("id").eq("invalid",0);
         if(keyword != null && (!keyword.equals(""))) {
-            wrapper.and(i -> i.like("title", keyword).or().like("text", keyword).or().like("description", keyword));
+            wrapper.and(i -> i.like("title", keyword).or().like("text", keyword).or().like("description", keyword).or().like("tags", keyword));
         }
 
         page = blogArticleMapper.selectPage(page,wrapper);
@@ -63,6 +76,11 @@ public class BlogArticleController {
         System.out.println(permissionChecker.toString());
         /* 是否登录，以及用户权限是否足够，同时返回错误码 */
         int checkerCode = SessionManager.checkSession(permissionChecker.getUserToken());
+        QueryWrapper<DSUser> wrapper = Wrappers.query();
+        wrapper.likeRight("name", permissionChecker.getUserToken().getUserName());
+        if(checkerCode == 0 && userMapper.selectOne(wrapper).getPermission() > 0){
+            checkerCode = 4;
+        }
         if(checkerCode != 0){
             switch(checkerCode){
                 case 1:
@@ -71,12 +89,16 @@ public class BlogArticleController {
                     return "Error: Session Wrong";
                 case 3:
                     return "Error: Session Expired";
+                case 4:
+                    return "Error: Permission Not Enough";
+                default:
+                    return "Unknown Error";
             }
         }
         /* 自动填充摘要、作者、人气和可用性 */
         BlogArticle blogArticle = permissionChecker.getBlogArticle();
         if(blogArticle.getDescription() == null && blogArticle.getText().length() > 0){
-            blogArticle.setDescription(blogArticle.getText().substring(0,Math.min(10,blogArticle.getText().length())));
+            blogArticle.setDescription(blogArticle.getText().substring(0,Math.min(200,blogArticle.getText().length())));
             System.out.println("Over");
         }
         if(blogArticle.getAuthor() == null){
@@ -100,6 +122,11 @@ public class BlogArticleController {
         UserToken userToken = new UserToken(encryption,userName);
         /* 是否登录，以及用户权限是否足够，同时返回错误码 */
         int checkerCode = SessionManager.checkSession(userToken);
+        QueryWrapper<DSUser> wrapper = Wrappers.query();
+        wrapper.likeRight("name", userName);
+        if(checkerCode == 0 && userMapper.selectOne(wrapper).getPermission() > 0){
+            checkerCode = 4;
+        }
         if(checkerCode != 0){
             return checkerCode;
         }
